@@ -7,6 +7,7 @@
 
 <script>
 export default {
+    name: 'Seller',
     data() {
         return {
             chartInstance: null,
