@@ -19,6 +19,9 @@ export default {
         window.addEventListener('resize', this.screenAdapter);
         this.screenAdapter();
     },
+    destroyed() {
+        window.removeEventListener('resize', this.screenAdapter);
+    },
     methods: {
         async initData() {
             this.chartInstance = this.$echarts.init(this.$refs.map_ref, 'chalk');

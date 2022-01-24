@@ -38,7 +38,7 @@ export default {
             });
             var initOpntion = {
                 title: {
-                    text: '▕ 商家销售量统计',
+                    text: '▏ 商家销售量统计',
                     textStyle: {
                         color: 'white',
                     },

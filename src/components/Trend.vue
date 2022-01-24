@@ -2,7 +2,7 @@
 <template>
   <div class="com-container">
       <div class="showTitle" :style="titleStyle">
-          <span>{{'▕ ' + showTitle}}</span>
+          <span>{{'▏ ' + showTitle}}</span>
           <span class="iconfont showTitle-icon" @click="showChoice=!showChoice">&#xe6eb;</span>
           <div class="select-con" :style="marginStyle" v-show="showChoice" v-for="item in selectTypes" :key="item.key" @click="handleSelect(item)">{{item.text}}</div>
       </div>

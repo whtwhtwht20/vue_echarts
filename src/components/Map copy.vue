@@ -16,6 +16,9 @@ export default {
         this.initData();
         this.getData();
     },
+    destroyed() {
+        window.removeEventListener('resize', this.screenAdapter);
+    },
     methods: {
         initData() {
             this.chartInstance = this.$echarts.init(this.$refs.map_ref, 'chalk');
