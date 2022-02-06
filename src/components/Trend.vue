@@ -42,13 +42,23 @@ export default {
             }
         }
     },
+    created() {
+        this.$socket.registerCallBack('trendData', this.getData);
+    },
     mounted() {
         this.initData();
-        this.getData();
+        // this.getData();
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'trendData',
+            chartName: 'trend',
+            value: ''
+        });
         window.addEventListener('resize', this.screenAdapter);
     },
     destroyed() {
         window.removeEventListener('resize', this.screenAdapter);
+        this.$socket.unRegisterCallBack('trendData');
     },
     methods: {
         initData() {
@@ -87,8 +97,8 @@ export default {
             };
             this.chartInstance.setOption(initOption);
         },
-        async getData() {
-            const { data:ret } = await this.$axios.get('trend');
+        getData(ret) {
+            // const { data:ret } = await this.$axios.get('trend');
             this.allData = ret;
             const type = ret.type
             this.showTitle = type[0].text;

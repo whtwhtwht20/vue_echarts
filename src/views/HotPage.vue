@@ -1,15 +1,15 @@
 <template>
     <div>
-        <single-map />
+        <Hot />
     </div>
 </template>
 
 <script>
-import Map from "components/Map"
+import Hot from "components/Hot"
 export default {
-    name: 'mapPage',
+    name: 'hotPage',
     components: {
-        'single-map': Map
+        Hot
     }
 }
 </script>

@@ -1,15 +1,15 @@
 <template>
     <div>
-        <single-map />
+        <Stock />
     </div>
 </template>
 
 <script>
-import Map from "components/Map"
+import Stock from "components/Stock"
 export default {
-    name: 'mapPage',
+    name: 'stockPage',
     components: {
-        'single-map': Map
+        Stock
     }
 }
 </script>

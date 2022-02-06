@@ -8,6 +8,11 @@ import './assets/css/global.less'
 // 引入字体文件
 import './assets/font/iconfont.css'
 
+import SocketService from './utils/socket.service'
+
+SocketService.Instance.connect();
+Vue.prototype.$socket = SocketService.Instance;
+
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api';
 Vue.prototype.$axios = axios;
 
