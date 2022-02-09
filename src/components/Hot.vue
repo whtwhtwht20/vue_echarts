@@ -1,6 +1,6 @@
 <template>
     <div class="com-container">
-        <div class="com-chart" style="height: 660px" ref="hot_ref"></div>
+        <div class="com-chart" ref="hot_ref"></div>
         <span class="iconfont arr-left" @click="toLeft" :style="comStyle">&#xe6ef;</span>
         <span class="iconfont arr-right" @click="toRight" :style="comStyle">&#xe6ed;</span>
         <span class="cat-name" :style="comStyle">{{currentTitle}}</span>
@@ -17,6 +17,9 @@ export default {
             currentIndex: 0,
             titleFontSize: 0
         }
+    },
+    created() {
+        this.$socket.registerCallBack('hotData', this.getData);
     },
     computed: {
         selectTypeArr() {
@@ -39,9 +42,18 @@ export default {
     },
     mounted() {
         this.initData();
-        this.getData();
+        // this.getData();
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'hotData',
+            chartName: 'hotproduct',
+            value: ''
+        });
+        window.addEventListener('resize', this.screenAdapter)
+
     },
     destroyed() {
+        this.$socket.unRegisterCallBack('hotData');
         window.removeEventListener('resize', this.screenAdapter);
     },
     methods: {
@@ -92,10 +104,9 @@ export default {
                 ],
             }
             this.chartInstance.setOption(initOption);
-            window.addEventListener('resize', this.screenAdapter)
         },
-        async getData() {
-            const { data: ret } = await this.$axios.get('hotproduct');
+        getData(ret) {
+            // const { data: ret } = await this.$axios.get('hotproduct');
             this.allData = ret;
             this.updataChart();
         },
@@ -136,8 +147,8 @@ export default {
                     }
                 ],
                 legend: {
-                    itemWidth: this.titleFontSize / 2,
-                    itemHeight: this.titleFontSize / 2,
+                    itemWidth: this.titleFontSize,
+                    itemHeight: this.titleFontSize,
                     itemGap: this.titleFontSize / 2,
                     textStyle: {
                         fontSize: this.titleFontSize / 2

@@ -1,6 +1,6 @@
 <template>
     <div class="com-container">
-        <div class="com-chart" style="height: 660px" ref="rank_ref"></div>
+        <div class="com-chart" ref="rank_ref"></div>
     </div>
 </template>
 
@@ -15,9 +15,18 @@ export default {
             timeInterval: null
         }
     },
+    created() {
+        this.$socket.registerCallBack('rankData', this.getData);
+    },
     mounted() {
         this.initData();
-        this.getData();
+        // this.getData();
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'rankData',
+            chartName: 'rank',
+            value: ''
+        });
         window.addEventListener('resize', this.screenAdapter);
         this.screenAdapter();
         this.startInterval();
@@ -31,6 +40,7 @@ export default {
     },
     destroyed() {
         clearInterval(this.timeInterval);
+        this.$socket.unRegisterCallBack('rankData');
         window.removeEventListener('resize', this.screenAdapter);
     },
     methods: {
@@ -63,8 +73,8 @@ export default {
             this.chartInstance.setOption(initOption);
             window.addEventListener('resize', this.screenAdapter)
         },
-        async getData() {
-            const { data :ret } = await this.$axios.get('rank');
+        getData(ret) {
+            // const { data :ret } = await this.$axios.get('rank');
             this.allData = ret.sort((a,b) => b.value - a.value);
             this.updataChart();
         },

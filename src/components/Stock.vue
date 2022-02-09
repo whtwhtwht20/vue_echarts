@@ -1,6 +1,6 @@
 <template>
     <div class="com-container">
-        <div class="com-chart" style="height: 660px" ref="stock_ref"></div>
+        <div class="com-chart" ref="stock_ref"></div>
     </div>
 </template>
 
@@ -15,14 +15,25 @@ export default {
             timeId: null
         }
     },
+    created() {
+        this.$socket.registerCallBack('stockData', this.getData);
+    },
     mounted() {
         this.initData();
-        this.getData();
+        // this.getData();
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'stockData',
+            chartName: 'stock',
+            value: ''
+        });
+        window.addEventListener('resize', this.screenAdapter)
         this.startInterval();
     },
     destroyed() {
         window.removeEventListener('resize', this.screenAdapter);
         clearInterval(this.timeId);
+        this.$socket.unRegisterCallBack('trendData');
     },
     methods: {
         initData() {
@@ -44,10 +55,9 @@ export default {
                 }
             }
             this.chartInstance.setOption(initOption);
-            window.addEventListener('resize', this.screenAdapter)
         },
-        async getData() {
-            const { data:ret } = await this.$axios.get('stock');
+        getData(ret) {
+            // const { data:ret } = await this.$axios.get('stock');
             this.allData = ret;
             this.updataChart();
         },
@@ -77,7 +87,7 @@ export default {
                     },
                     data: [
                         {
-                            name: item.name + '\n' + item.sales,
+                            name: item.name + '\n\n' + item.sales,
                             value: item.sales,
                             itemStyle: {
                                 color: new this.$echarts.graphic.LinearGradient(0,1,0,0,[
@@ -113,7 +123,7 @@ export default {
         },
         screenAdapter() {
             const titleFontSize = this.$refs.stock_ref.offsetWidth / 100 * 3.6;
-            const innerRadius = titleFontSize * 2;
+            const innerRadius = titleFontSize * 2.8;
             const outterRadius = innerRadius * 1.125;
             const seriesArr = this.allData.map(() => {
                 return {

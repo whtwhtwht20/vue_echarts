@@ -17,9 +17,18 @@ export default {
             timeId: null
         }
     },
+    created() {
+        this.$socket.registerCallBack('sellerData', this.getData);
+    },
     mounted() {
         this.initChart();
-        this.getData();
+        // this.getData();
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'sellerData',
+            chartName: 'seller',
+            value: ''
+        });
         window.addEventListener('resize', this.screenAdapter);
         this.screenAdapter();
     },
@@ -106,8 +115,8 @@ export default {
             this.chartInstance.setOption(initOpntion);
         },
         // 获取服务器的数据
-        async getData() {
-            const {data: ret} = await this.$axios.get('seller');
+        getData(ret) {
+            // const {data: ret} = await this.$axios.get('seller');
             this.allData = ret;
             this.allData.sort((a,b) => {
                 return b.value - a.value;
@@ -182,10 +191,11 @@ export default {
         }
     },
     destroyed() {
-        clearInterval(self.timeId);
+        clearInterval(this.timeId);
         removeEventListener('resize', this.screenAdapter);
         this.chartInstance.off('mousemove');
         this.chartInstance.off('mouseout');
+        this.$socket.unRegisterCallBack('sellerData');
     }
 }
 </script>
