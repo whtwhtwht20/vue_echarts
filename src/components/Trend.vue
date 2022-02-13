@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
     name: 'Trend',
     data() {
@@ -22,6 +23,19 @@ export default {
             choiceType: '',
             titleFontSize: 0
         }
+    },
+    watch: {
+        theme() {
+        console.log('主题切换了')
+        // 销毁当前的图表
+        this.chartInstance.dispose()
+        // 以最新主题初始化图表对象
+        this.initChart()
+        // 屏幕适配
+        this.screenAdapter()
+        // 渲染数据
+        this.updateChart()
+        },
     },
     computed: {
         selectTypes() {
@@ -40,13 +54,14 @@ export default {
             return {
                 marginLeft: + this.titleFontSize + 'px'
             }
-        }
+        },
+        ...mapState(['theme']),
     },
     created() {
         this.$socket.registerCallBack('trendData', this.getData);
     },
     mounted() {
-        this.initData();
+        this.initChart();
         // this.getData();
         this.$socket.send({
             action: 'getData',
@@ -61,8 +76,8 @@ export default {
         this.$socket.unRegisterCallBack('trendData');
     },
     methods: {
-        initData() {
-            this.chartInstance = this.$echarts.init(this.$refs.trend_ref, 'chalk');
+        initChart() {
+            this.chartInstance = this.$echarts.init(this.$refs.trend_ref, this.theme);
             const initOption = {
                 legend: {
                     type: 'plain',
@@ -103,9 +118,9 @@ export default {
             const type = ret.type
             this.showTitle = type[0].text;
             this.choiceType = type[0].key;
-            this.updataData();
+            this.updateChart();
         },
-        updataData() {
+        updateChart() {
             const colorArr1 = [
                 'rgba(11, 168, 44, 0.5)',
                 'rgba(44, 110, 255, 0.5)',
@@ -173,7 +188,7 @@ export default {
             if (item.text != this.showTitle) {
                 this.choiceType = item.key;
                 this.showTitle = item.text;
-                this.updataData(item.key);
+                this.updateChart(item.key);
             }
             this.showChoice=false;
         }

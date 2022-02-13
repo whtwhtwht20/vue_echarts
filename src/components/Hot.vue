@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
     name: 'Hot',
     data() {
@@ -38,10 +39,24 @@ export default {
             return {
                 fontSize: this.titleFontSize + 'px'
             }
-        }
+        },
+        ...mapState(['theme']),
+    },
+    watch: {
+        theme() {
+        console.log('主题切换了')
+        // 销毁当前的图表
+        this.chartInstance.dispose()
+        // 以最新主题初始化图表对象
+        this.initChart()
+        // 屏幕适配
+        this.screenAdapter()
+        // 渲染数据
+        this.updateChart()
+        },
     },
     mounted() {
-        this.initData();
+        this.initChart();
         // this.getData();
         this.$socket.send({
             action: 'getData',
@@ -57,8 +72,8 @@ export default {
         window.removeEventListener('resize', this.screenAdapter);
     },
     methods: {
-        initData() {
-            this.chartInstance = this.$echarts.init(this.$refs.hot_ref, 'chalk');
+        initChart() {
+            this.chartInstance = this.$echarts.init(this.$refs.hot_ref, );
             var initOption = {
                 title: {
                     text: '▏热销商品的占比',
@@ -108,9 +123,9 @@ export default {
         getData(ret) {
             // const { data: ret } = await this.$axios.get('hotproduct');
             this.allData = ret;
-            this.updataChart();
+            this.updateChart();
         },
-        updataChart() {
+        updateChart() {
             const seriesData = this.allData[this.currentIndex].children.map(item => {
                 return {
                     value: item.value,
@@ -161,12 +176,12 @@ export default {
         toLeft() {
             this.currentIndex--;
             if (this.currentIndex < 0) this.currentIndex = this.allData.length - 1;
-            this.updataChart();
+            this.updateChart();
         },
         toRight() {
             this.currentIndex++;
             if (this.currentIndex > (this.allData.length - 1)) this.currentIndex = 0;
-            this.updataChart();
+            this.updateChart();
         }
     }
 }

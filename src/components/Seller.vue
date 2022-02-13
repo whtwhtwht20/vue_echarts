@@ -6,9 +6,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
     name: 'Seller',
-    data() {
+    data() { 
         return {
             chartInstance: null,
             allData: [],
@@ -35,7 +36,7 @@ export default {
     methods: {
         // 初始化echartsInstance对象
         initChart() {
-            this.chartInstance = this.$echarts.init(this.$refs.seller_ref, 'chalk');
+            this.chartInstance = this.$echarts.init(this.$refs.seller_ref, this.theme);
             this.chartInstance.on('mousemove', () => {
                 if (this.timeId) {
                     clearInterval(this.timeId);
@@ -55,8 +56,12 @@ export default {
                     left: '8%'
                 },
                 grid: {
-                    top: '15%',
-                    // containLabel: true
+                    top: '20%',
+                    left: '3%',
+                    right: '6%',
+                    bottom: '3%',
+                    // 默认grid不包含坐标轴文字，改为true
+                    containLabel: true,
                 },
                 tooltip: {
                     trigger: 'axis',
@@ -122,11 +127,11 @@ export default {
                 return b.value - a.value;
             });
             this.totalPage = this.allData.length % 5 == 0 ? this.allData.length / 5 : this.allData.length / 5 + 1;
-            this.updataChart();
+            this.updateChart();
             this.startInterval()
         },
         // 更新图表
-        updataChart() {
+        updateChart() {
             const start = (this.currentPage - 1) * 5 ;
             const end = this.currentPage * 5;
             const showData = this.allData.slice(start, end);
@@ -158,7 +163,7 @@ export default {
                 } else {
                     this.currentPage = 1;
                 }
-                this.updataChart();
+                this.updateChart();
             },3000)
         },
         // 适配配置处理
@@ -196,7 +201,23 @@ export default {
         this.chartInstance.off('mousemove');
         this.chartInstance.off('mouseout');
         this.$socket.unRegisterCallBack('sellerData');
-    }
+    },
+    computed: {
+        ...mapState(['theme']),
+    },
+    watch: {
+        theme() {
+        console.log('主题切换了')
+        // 销毁当前的图表
+        this.chartInstance.dispose()
+        // 以最新主题初始化图表对象
+        this.initChart()
+        // 屏幕适配
+        this.screenAdapter()
+        // 渲染数据
+        this.updateChart()
+        },
+    },
 }
 </script>
 

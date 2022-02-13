@@ -70,13 +70,16 @@
 </template>
 
 <script>
-import Hot from '@/components//Hot.vue'
-import Map from '@/components//Map.vue'
-import Rank from '@/components//Rank.vue'
-import Seller from '@/components//Seller.vue'
-import Stock from '@/components//Stock.vue'
-import Trend from '@/components//Trend.vue'
+import Hot from '@/components/Hot.vue'
+import Map from '@/components/Map.vue'
+import Rank from '@/components/Rank.vue'
+import Seller from '@/components/Seller.vue'
+import Stock from '@/components/Stock.vue'
+import Trend from '@/components/Trend.vue'
 
+import { mapState } from 'vuex'
+// 导入自己定义的主题工具函数 用于返回不同主题下的配置对象
+import { getThemeValue } from 'utils/theme_utils'
 
 export default {
   name: 'ScreenPage',
@@ -109,10 +112,30 @@ export default {
     // 注册服务端广播的全屏事件
     this.$socket.registerCallBack('fullScreen', this.recvData)
     // 注册服务器广播的主题切换事件
-    // this.$socket.registerCallBack('themeChange', this.recvThemeChange)
+    this.$socket.registerCallBack('themeChange', this.recvThemeChange)
     this.currentTime()
   },
   computed: {
+    ...mapState(['theme']),
+    // 头部的边框路径
+    headerSrc() {
+      return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+    },
+    // 主题图片的路径
+    themeSrc() {
+      return '/static/img/' + getThemeValue(this.theme).themeSrc
+    },
+    containerStyle() {
+      return {
+        backgroundColor: getThemeValue(this.theme).backgroundColor,
+        color: getThemeValue(this.theme).titleColor,
+      }
+    },
+    titleColor() {
+      return {
+        color: getThemeValue(this.theme).titleColor,
+      }
+    },
   },
   destroyed() {
     // 组件销毁时，销毁事件

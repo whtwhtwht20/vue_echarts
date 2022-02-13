@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
     name: 'Stock',
     data() {
@@ -19,7 +20,7 @@ export default {
         this.$socket.registerCallBack('stockData', this.getData);
     },
     mounted() {
-        this.initData();
+        this.initChart();
         // this.getData();
         this.$socket.send({
             action: 'getData',
@@ -36,8 +37,8 @@ export default {
         this.$socket.unRegisterCallBack('trendData');
     },
     methods: {
-        initData() {
-            this.chartInstance = this.$echarts.init(this.$refs.stock_ref, 'chalk');
+        initChart() {
+            this.chartInstance = this.$echarts.init(this.$refs.stock_ref, this.theme);
             this.chartInstance.on('mousemove', () => {
                 if (this.timeId) {
                     clearInterval(this.timeId);
@@ -59,9 +60,9 @@ export default {
         getData(ret) {
             // const { data:ret } = await this.$axios.get('stock');
             this.allData = ret;
-            this.updataChart();
+            this.updateChart();
         },
-        updataChart() {
+        updateChart() {
             const centerArr = [
                 ['18%', '40%'],
                 ['50%', '40%'],
@@ -154,10 +155,26 @@ export default {
                 if (this.currentIndex > (this.allData.length / 5 - 1)) {
                     this.currentIndex = 0;
                 }
-                this.updataChart();
+                this.updateChart();
             }, 3000)
         }
-    }
+    },
+    computed: {
+        ...mapState(['theme']),
+    },
+    watch: {
+        theme() {
+        console.log('主题切换了')
+        // 销毁当前的图表
+        this.chartInstance.dispose()
+        // 以最新主题初始化图表对象
+        this.initChart()
+        // 屏幕适配
+        this.screenAdapter()
+        // 渲染数据
+        this.updateChart()
+        },
+    },
 }
 </script>
 
